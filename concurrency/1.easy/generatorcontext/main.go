@@ -15,6 +15,7 @@ func generate(ctx context.Context, start int) <-chan int {
 			select {
 			case out <- i:
 			case <-ctx.Done():
+				fmt.Println("Done!")
 				return
 			}
 		}
@@ -23,13 +24,13 @@ func generate(ctx context.Context, start int) <-chan int {
 }
 
 func main() {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	generated := generate(ctx, 11)
 	for num := range generated {
 		fmt.Print(num, " ")
 		if num > 14 {
-			break
+			cancel()
 		}
 	}
 	fmt.Println()
